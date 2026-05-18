@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>
-      Alfaship — Inspección Autónoma con Drones para Buques de Carga
+      InPort — Inspección Autónoma con Drones para Buques de Carga
     </title>
     <meta
       name="description"
@@ -12,7 +12,7 @@
     />
     <meta
       property="og:title"
-      content="Alfaship — Inspección Autónoma con Drones"
+      content="InPort — Inspección Autónoma con Drones"
     />
     <meta
       property="og:description"
@@ -22,13 +22,13 @@
     <meta name="twitter:card" content="summary" />
     <meta
       name="twitter:title"
-      content="Alfaship — Inspección Autónoma con Drones"
+      content="InPort — Inspección Autónoma con Drones"
     />
     <meta
       name="twitter:description"
       content="Revolucionamos la inspección marítima con drones autónomos e inteligencia artificial."
     />
-    <link rel="icon" href="./logo.png" />
+    <link rel="icon" href="./logo.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       rel="preconnect"
@@ -115,11 +115,11 @@
         padding: 0 24px;
       }
       .section-padding {
-        padding: 100px 0;
+        padding: 160px 0;
       }
       .section-header {
         text-align: center;
-        margin-bottom: 64px;
+        margin-bottom: 80px;
       }
       .section-label {
         letter-spacing: 3px;
@@ -225,7 +225,6 @@
         display: flex;
       }
       .nav-logo {
-        filter: brightness(0) invert();
         width: auto;
         height: 108px;
         transition: var(--transition);
@@ -422,9 +421,14 @@
         position: relative;
       }
       .services-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: 32px;
         display: grid;
+      }
+      @media (max-width: 1000px) {
+        .services-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
       }
       .service-card {
         background: var(--bg-white);
@@ -453,7 +457,7 @@
         transform: scaleX(1);
       }
       .card-toggle {
-        cursor: default;
+        cursor: pointer;
         text-align: left;
         width: 100%;
         color: inherit;
@@ -464,6 +468,10 @@
         padding: 32px;
         font-family: inherit;
         display: flex;
+        transition: var(--transition);
+      }
+      .card-toggle:hover .card-title {
+        color: var(--accent);
       }
       .card-header {
         align-items: center;
@@ -482,8 +490,27 @@
         margin: 0;
         font-size: 1.2rem;
         font-weight: 700;
+        transition: var(--transition);
+      }
+      .card-chevron {
+        color: var(--accent);
+        flex-shrink: 0;
+        margin-left: 12px;
+        transition: transform var(--transition);
+      }
+      .service-card.open .card-chevron {
+        transform: rotate(180deg);
       }
       .card-body {
+        max-height: 0;
+        overflow: hidden;
+        padding: 0 32px;
+        transition:
+          max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+          padding 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .service-card.open .card-body {
+        max-height: 600px;
         padding: 0 32px 32px;
       }
       .card-text {
@@ -886,7 +913,6 @@
         display: flex;
       }
       .footer-logo {
-        filter: brightness(0) invert();
         opacity: 0.7;
         height: 30px;
         transition: var(--transition);
@@ -936,7 +962,7 @@
     <nav class="navbar" id="navbar">
       <div class="nav-content">
         <a href="#hero">
-          <img src="./logo.png" alt="Alfaship" class="nav-logo" />
+          <img src="./logo.svg" alt="InPort" class="nav-logo" />
         </a>
         <button
           class="menu-toggle"
@@ -966,10 +992,10 @@
         <div class="hero-overlay"></div>
         <div class="hero-content">
           <div class="hero-badge">Inspección Autónoma con Drones</div>
-          <h1 class="hero-title">3Drone</h1>
+          <h1 class="hero-title">3SG</h1>
           <p class="hero-subtitle">
             Escaneo completo de la carga del buque mediante drones autónomos que
-            generan un modelo 3D con nuestra tecnología innovadora 3Drone.
+            generan un modelo 3D con nuestra tecnología innovadora 3SG.
             Rastreamos cada contenedor para detectar daños.
           </p>
           <div class="hero-actions">
@@ -989,7 +1015,7 @@
         <div class="container">
           <div class="section-header">
             <span class="section-label">Soluciones</span>
-            <h2 class="section-title">Nuestro estándar 3Drone</h2>
+            <h2 class="section-title">Nuestro estándar 3SG</h2>
             <p class="section-subtitle">
               Tecnología autónoma de drones que genera modelos 3D para la
               inspección integral de buques de carga
@@ -997,17 +1023,69 @@
           </div>
           <div class="services-grid">
             <div class="service-card">
-              <div class="card-toggle">
+              <button
+                class="card-toggle"
+                aria-expanded="false"
+                onclick="toggleServices()"
+              >
                 <div class="card-header">
                   <span class="card-number">01</span>
+                  <h3 class="card-title">Escaneo del Casco</h3>
+                </div>
+                <svg
+                  class="card-chevron"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+              <div class="card-body">
+                <p class="card-text">
+                  Escaneo del casco del barco para la identificación de áreas
+                  en mal estado mediante algoritmos automatizados. Nuestros
+                  drones capturan cada zona del casco y, con la tecnología
+                  3SG, detectan corrosión, deformaciones y daños
+                  estructurales con precisión milimétrica.
+                </p>
+                <span class="card-stat">Detección automática</span>
+              </div>
+            </div>
+            <div class="service-card">
+              <button
+                class="card-toggle"
+                aria-expanded="false"
+                onclick="toggleServices()"
+              >
+                <div class="card-header">
+                  <span class="card-number">02</span>
                   <h3 class="card-title">Escaneo 3D de Carga</h3>
                 </div>
-              </div>
+                <svg
+                  class="card-chevron"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
               <div class="card-body">
                 <p class="card-text">
                   Nuestros drones autónomos escanean la totalidad de la carga
                   del buque y generan un modelo 3D de alta precisión. Mediante
-                  la tecnología 3Drone, rastreamos el estado de cada contenedor
+                  la tecnología 3SG, rastreamos el estado de cada contenedor
                   para detectar daños producidos en puerto o durante la
                   travesía.
                 </p>
@@ -1015,17 +1093,34 @@
               </div>
             </div>
             <div class="service-card">
-              <div class="card-toggle">
+              <button
+                class="card-toggle"
+                aria-expanded="false"
+                onclick="toggleServices()"
+              >
                 <div class="card-header">
-                  <span class="card-number">02</span>
+                  <span class="card-number">03</span>
                   <h3 class="card-title">Inspección de Cubierta</h3>
                 </div>
-              </div>
+                <svg
+                  class="card-chevron"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
               <div class="card-body">
                 <p class="card-text">
                   Escaneamos la cubierta del buque antes y después de la
                   limpieza, generando modelos 3D comparativos con tecnología
-                  3Drone. Se verifica de forma objetiva el estado de la
+                  3SG. Se verifica de forma objetiva el estado de la
                   superficie, detectando suciedad residual, corrosión o daños
                   estructurales.
                 </p>
@@ -1048,13 +1143,13 @@
         </div>
         <div class="vb-overlay"></div>
         <div class="vb-content">
-          <span class="vb-label">Solución 02 — Inspección de Cubierta</span>
+          <span class="vb-label">Solución 03 — Inspección de Cubierta</span>
           <h2 class="vb-title">
             Escaneo de la <span class="vb-accent">cubierta del buque</span>
             antes y después de la limpieza
           </h2>
           <p class="vb-subtitle">
-            Generamos modelos 3D comparativos con tecnología 3Drone para
+            Generamos modelos 3D comparativos con tecnología 3SG para
             verificar objetivamente el estado de la superficie: suciedad
             residual, corrosión y daños estructurales.
           </p>
@@ -1073,7 +1168,7 @@
               <p class="about-text">
                 Nuestro sistema de drones autónomos transforma la manera en que
                 se realizan las inspecciones de carga y buques. Mediante la
-                generación de modelos 3D con tecnología 3Drone, eliminamos la
+                generación de modelos 3D con tecnología 3SG, eliminamos la
                 subjetividad, reducimos costes y proporcionamos datos más
                 precisos que cualquier método tradicional.
               </p>
@@ -1104,7 +1199,7 @@
             <div>
               <div class="feature-grid">
                 <div class="feature-card">
-                  <div class="feature-title">Tecnología 3Drone</div>
+                  <div class="feature-title">Tecnología 3SG</div>
                   <div class="feature-text">
                     Modelos 3D generados a partir de escaneos autónomos que
                     permiten análisis dimensional y comparativo con precisión
@@ -1135,13 +1230,13 @@
       <section id="nica-viewer" class="nica-viewer section-padding">
         <div class="container">
           <div class="section-header">
-            <span class="section-label">Tecnología 3Drone en Acción</span>
+            <span class="section-label">Tecnología 3SG en Acción</span>
             <h2 class="section-title section-title--light">
               Explore el modelo 3D generado por nuestros drones
             </h2>
             <p class="section-subtitle section-subtitle--light">
               Este entorno interactivo ha sido creado a partir de vídeo de dron
-              procesado con nuestra tecnología 3Drone. Navegue libremente por la
+              procesado con nuestra tecnología 3SG. Navegue libremente por la
               escena 3D para ver el nivel de detalle que capturamos en cada
               inspección.
             </p>
@@ -1171,8 +1266,8 @@
                 </div>
               </div>
               <iframe
-                src="https://dareplanetshuttle.github.io/NICA-WebViewer/"
-                title="NICA 3D WebViewer"
+                src="./splat-viewer.html"
+                title="3SG Splat Viewer"
                 class="viewer-iframe"
                 allowfullscreen=""
                 loading="lazy"
@@ -1268,7 +1363,7 @@
       <div class="container">
         <div class="footer-content">
           <a href="#hero">
-            <img src="./logo.png" alt="Alfaship" class="footer-logo" />
+            <img src="./logo.svg" alt="InPort" class="footer-logo" />
           </a>
           <div class="footer-links">
             <a href="#services" class="footer-link">Servicios</a>
@@ -1277,7 +1372,7 @@
           </div>
         </div>
         <div class="footer-bottom">
-          <span>codegenia</span>
+          <span>InPort</span>
           <span>Inspección Autónoma con Drones</span>
         </div>
       </div>
@@ -1290,6 +1385,17 @@
           .getElementById("navbar")
           .classList.toggle("scrolled", window.scrollY > 50);
       });
+
+      // Services dropdown — toggle all cards together
+      function toggleServices() {
+        var cards = document.querySelectorAll(".services-grid .service-card");
+        var willOpen = !cards[0].classList.contains("open");
+        cards.forEach(function (card) {
+          card.classList.toggle("open", willOpen);
+          var btn = card.querySelector(".card-toggle");
+          if (btn) btn.setAttribute("aria-expanded", String(willOpen));
+        });
+      }
     </script>
   </body>
 </html>

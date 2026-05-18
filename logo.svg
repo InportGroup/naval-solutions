@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" width="100%" height="100%">
+  <style>
+    .brand-title {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-weight: 700;
+      fill: #FFFFFF;
+      font-size: 140px;
+      letter-spacing: -3px;
+    }
+    .brand-slogan {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-weight: 500;
+      fill: #FFFFFF;
+      font-size: 20px;
+      letter-spacing: -0.5px;
+    }
+  </style>
+
+  <rect width="100%" height="100%" fill="none" />
+
+  <g transform="translate(100, 40)">
+    <text x="0" y="140" class="brand-title">InPort</text>
+    
+    <text x="500" y="195" class="brand-slogan" text-anchor="end">Integrate. Automate. Elevate.</text>
+  </g>
+</svg>
