@@ -963,9 +963,11 @@ async function main() {
         activeKeys = [];
     });
 
-    window.addEventListener(
+    canvas.addEventListener(
         "wheel",
         (e) => {
+            // Only dolly when the user is holding Ctrl; otherwise let the page scroll.
+            if (!e.ctrlKey) return;
             carousel = false;
             e.preventDefault();
             const lineHeight = 10;
