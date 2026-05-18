@@ -738,6 +738,77 @@ let defaultViewMatrix = [
     0.21, 0.95, 7.5, 1,
 ];
 let viewMatrix = defaultViewMatrix;
+
+// Hand-captured camera path: each entry is [px, py, pz, qx, qy, qz, qw]
+// (camera world position + cam->world rotation quaternion).
+const PATH_SEGMENT_MS = 2000;
+const PATH_KEYFRAMES = [
+    [1.786969, -1.913724, -5.946224, -0.208614, -0.091814, -0.014165, 0.973576],
+    [-4.489941, -1.121734, -4.461679, -0.115172, 0.423634, -0.050177, 0.897079],
+    [-6.614577, 0.371652, 1.982126, 0.008261, 0.877793, -0.021033, 0.478506],
+    [-4.222045, 0.353798, 4.222685, 0.012180, 0.953876, -0.019034, 0.299351],
+    [-2.211820, 0.306388, 4.989591, 0.014887, 0.987899, -0.017000, 0.153444],
+    [1.202548, 0.234022, 6.573065, 0.018883, 0.993037, -0.012413, -0.115619],
+    [3.998267, 0.098644, 5.249202, 0.021096, 0.945506, -0.008099, -0.324819],
+    [5.548615, -1.268535, 5.825436, 0.049914, 0.931768, 0.052348, -0.355775],
+    [7.587308, -1.269010, 1.552090, -0.031240, -0.775697, -0.065236, 0.626947],
+    [6.098976, -0.733044, -3.060651, -0.064717, -0.494880, -0.104675, 0.860203],
+    [4.578471, -2.652057, -3.103024, -0.202175, -0.459775, -0.153593, 0.850965],
+    [1.495746, -3.464418, -5.869428, -0.221129, -0.050367, -0.026265, 0.973589],
+    [-5.159682, -1.966669, -3.370748, -0.179880, 0.441445, -0.036010, 0.878335],
+    [-6.713696, -0.795421, 0.192810, -0.021908, 0.722934, -0.002535, 0.690565],
+    [-4.973669, -0.621029, 3.883550, -0.019245, 0.933001, -0.010770, 0.359199],
+    [-1.142145, -0.438387, 6.080067, -0.014881, 0.998629, -0.016277, 0.047473],
+    [-1.342277, -0.373085, 8.169489, -0.014881, 0.998629, -0.016277, 0.047473],
+];
+
+function slerp(a, b, t) {
+    let dot = a[3]*b[3] + a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+    let bx = b[0], by = b[1], bz = b[2], bw = b[3];
+    if (dot < 0) { bx = -bx; by = -by; bz = -bz; bw = -bw; dot = -dot; }
+    if (dot > 0.9995) {
+        const r = [a[0] + t*(bx-a[0]), a[1] + t*(by-a[1]), a[2] + t*(bz-a[2]), a[3] + t*(bw-a[3])];
+        const n = Math.hypot(r[0], r[1], r[2], r[3]);
+        return [r[0]/n, r[1]/n, r[2]/n, r[3]/n];
+    }
+    const theta0 = Math.acos(dot);
+    const theta = theta0 * t;
+    const s1 = Math.sin(theta0 - theta) / Math.sin(theta0);
+    const s2 = Math.sin(theta) / Math.sin(theta0);
+    return [s1*a[0] + s2*bx, s1*a[1] + s2*by, s1*a[2] + s2*bz, s1*a[3] + s2*bw];
+}
+
+function getPathMatrix(elapsedMs) {
+    const total = PATH_KEYFRAMES.length;
+    const t = elapsedMs / PATH_SEGMENT_MS;
+    const segIndex = Math.floor(t) % total;
+    const segT = t - Math.floor(t);
+    const a = PATH_KEYFRAMES[segIndex];
+    const b = PATH_KEYFRAMES[(segIndex + 1) % total];
+
+    const px = a[0] + (b[0] - a[0]) * segT;
+    const py = a[1] + (b[1] - a[1]) * segT;
+    const pz = a[2] + (b[2] - a[2]) * segT;
+    const q = slerp([a[3], a[4], a[5], a[6]], [b[3], b[4], b[5], b[6]], segT);
+
+    // cam->world rotation from quaternion (row-major 3x3)
+    const x = q[0], y = q[1], z = q[2], w = q[3];
+    const r00 = 1 - 2*(y*y + z*z), r01 = 2*(x*y - z*w),     r02 = 2*(x*z + y*w);
+    const r10 = 2*(x*y + z*w),     r11 = 1 - 2*(x*x + z*z), r12 = 2*(y*z - x*w);
+    const r20 = 2*(x*z - y*w),     r21 = 2*(y*z + x*w),     r22 = 1 - 2*(x*x + y*y);
+
+    // world->cam is transpose. Translation = -world->cam * eye.
+    const t0 = -(r00*px + r10*py + r20*pz);
+    const t1 = -(r01*px + r11*py + r21*pz);
+    const t2 = -(r02*px + r12*py + r22*pz);
+
+    return [
+        r00, r01, r02, 0,
+        r10, r11, r12, 0,
+        r20, r21, r22, 0,
+        t0,  t1,  t2,  1,
+    ];
+}
 async function main() {
     let carousel = true;
     const params = new URLSearchParams(location.search);
@@ -1314,48 +1385,7 @@ async function main() {
         viewMatrix = invert4(inv);
 
         if (carousel) {
-            // Orbit camera around the cargo container scene center.
-            // Scene bounds (5-95%): x [-1.08, 1.66], y [-0.50, 0.81], z [-0.67, 0.54]
-            const cx = 0.3, cy = 0.15, cz = -0.07;
-            const radius = 4.5;
-            const height = 1.5;
-            const periodMs = 20000;
-            const angle = ((Date.now() - start) / periodMs) * Math.PI * 2;
-
-            const ex = cx + radius * Math.sin(angle);
-            const ey = cy - height; // Y-down: subtract to raise camera above scene
-            const ez = cz + radius * Math.cos(angle);
-
-            // lookAt(eye, target=(cx,cy,cz), up=(0,-1,0)) — splat is Y-down
-            let fx = cx - ex, fy = cy - ey, fz = cz - ez;
-            let fl = Math.hypot(fx, fy, fz); fx/=fl; fy/=fl; fz/=fl;
-            // right = normalize(cross(f, worldUp)) with worldUp=(0,-1,0) => (fz, 0, -fx)
-            let rx = fz, ry = 0, rz = -fx;
-            let rl = Math.hypot(rx, ry, rz); rx/=rl; ry/=rl; rz/=rl;
-            // up' = cross(r, f)
-            const ux = ry*fz - rz*fy;
-            const uy = rz*fx - rx*fz;
-            const uz = rx*fy - ry*fx;
-
-            viewMatrix = [
-                 rx,  ux, -fx, 0,
-                 ry,  uy, -fy, 0,
-                 rz,  uz, -fz, 0,
-                -(rx*ex + ry*ey + rz*ez),
-                -(ux*ex + uy*ey + uz*ez),
-                 (fx*ex + fy*ey + fz*ez),
-                 1,
-            ];
-        }
-
-        // Path-recorder hooks (only active when ?record=1)
-        if (window.__pathRecorder) {
-            const rec = window.__pathRecorder;
-            if (rec.playing && typeof rec.getPlaybackMatrix === "function") {
-                const m = rec.getPlaybackMatrix();
-                if (m) { viewMatrix = m; carousel = false; }
-            }
-            window.__viewMatrix = viewMatrix;
+            viewMatrix = getPathMatrix(Date.now() - start);
         }
 
         if (isJumping) {
