@@ -1321,14 +1321,14 @@ async function main() {
             const angle = ((Date.now() - start) / periodMs) * Math.PI * 2;
 
             const ex = cx + radius * Math.sin(angle);
-            const ey = cy + height;
+            const ey = cy - height; // Y-down: subtract to raise camera above scene
             const ez = cz + radius * Math.cos(angle);
 
-            // lookAt(eye, target=(cx,cy,cz), up=(0,1,0))
+            // lookAt(eye, target=(cx,cy,cz), up=(0,-1,0)) — splat is Y-down
             let fx = cx - ex, fy = cy - ey, fz = cz - ez;
             let fl = Math.hypot(fx, fy, fz); fx/=fl; fy/=fl; fz/=fl;
-            // right = normalize(cross(f, worldUp)) with worldUp=(0,1,0) => (-fz, 0, fx)
-            let rx = -fz, ry = 0, rz = fx;
+            // right = normalize(cross(f, worldUp)) with worldUp=(0,-1,0) => (fz, 0, -fx)
+            let rx = fz, ry = 0, rz = -fx;
             let rl = Math.hypot(rx, ry, rz); rx/=rl; ry/=rl; rz/=rl;
             // up' = cross(r, f)
             const ux = ry*fz - rz*fy;
