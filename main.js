@@ -1312,13 +1312,38 @@ async function main() {
         viewMatrix = invert4(inv);
 
         if (carousel) {
-            let inv = invert4(defaultViewMatrix);
+            // Orbit camera around the cargo container scene center.
+            // Scene bounds (5-95%): x [-1.08, 1.66], y [-0.50, 0.81], z [-0.67, 0.54]
+            const cx = 0.3, cy = 0.15, cz = -0.07;
+            const radius = 4.5;
+            const height = 1.5;
+            const periodMs = 20000;
+            const angle = ((Date.now() - start) / periodMs) * Math.PI * 2;
 
-            const t = Math.sin((Date.now() - start) / 5000);
-            inv = translate4(inv, 2.5 * t, 0, 6 * (1 - Math.cos(t)));
-            inv = rotate4(inv, -0.6 * t, 0, 1, 0);
+            const ex = cx + radius * Math.sin(angle);
+            const ey = cy + height;
+            const ez = cz + radius * Math.cos(angle);
 
-            viewMatrix = invert4(inv);
+            // lookAt(eye, target=(cx,cy,cz), up=(0,1,0))
+            let fx = cx - ex, fy = cy - ey, fz = cz - ez;
+            let fl = Math.hypot(fx, fy, fz); fx/=fl; fy/=fl; fz/=fl;
+            // right = normalize(cross(f, worldUp)) with worldUp=(0,1,0) => (-fz, 0, fx)
+            let rx = -fz, ry = 0, rz = fx;
+            let rl = Math.hypot(rx, ry, rz); rx/=rl; ry/=rl; rz/=rl;
+            // up' = cross(r, f)
+            const ux = ry*fz - rz*fy;
+            const uy = rz*fx - rx*fz;
+            const uz = rx*fy - ry*fx;
+
+            viewMatrix = [
+                 rx,  ux, -fx, 0,
+                 ry,  uy, -fy, 0,
+                 rz,  uz, -fz, 0,
+                -(rx*ex + ry*ey + rz*ez),
+                -(ux*ex + uy*ey + uz*ez),
+                 (fx*ex + fy*ey + fz*ez),
+                 1,
+            ];
         }
 
         if (isJumping) {
