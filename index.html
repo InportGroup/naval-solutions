@@ -29,6 +29,13 @@
       content="Revolucionamos la inspección marítima con drones autónomos e inteligencia artificial."
     />
     <link rel="icon" href="./logo.svg" />
+    <link
+      rel="preload"
+      as="fetch"
+      href="./Cargo_Container_cutted.splat"
+      type="application/octet-stream"
+      crossorigin
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       rel="preconnect"
@@ -1274,7 +1281,7 @@
       <!-- VIDEO BANNER -->
       <section id="deck-inspection" class="video-banner">
         <div class="vb-bg">
-          <video autoplay muted loop playsinline>
+          <video autoplay muted loop playsinline preload="metadata">
             <source
               src="./videos/Dron_cubierta_completo.mp4"
               type="video/mp4"
